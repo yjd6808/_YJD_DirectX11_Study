@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="01. Main">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="98. Headers">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="98. Headers\중요하지 않음">
+      <UniqueIdentifier>{b66e2d74-8f57-432d-99d0-56b59d4896ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Resources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="targetver.h">
+      <Filter>98. Headers\중요하지 않음</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>98. Headers\중요하지 않음</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>98. Headers\중요하지 않음</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
+      <Filter>01. Main</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Values.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Struct.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>01. Main</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp">
+      <Filter>01. Main</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>98. Headers</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>01. Main</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Project1.rc">
+      <Filter>99. Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>99. Resources</Filter>
+    </Image>
+    <Image Include="Project1.ico">
+      <Filter>99. Resources</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
