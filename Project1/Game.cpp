@@ -24,10 +24,19 @@ void Game::Init(HWND hwnd) {
 	_height = GMinSizeY;
 
 	CreateDeviceAndSwapChain();
+	CreateRenderTargetView();
+	SetViewPort();
 }
 
 void Game::Render() {
-	
+
+	// 준비작업을 먼저한다.
+	RenderBegin();
+
+	// 여기서 여러가지 물체들을 그린다.
+
+	// 그림을 다 그렸으니 제출한다.
+	RenderEnd();
 }
 
 void Game::Update() {
@@ -35,9 +44,30 @@ void Game::Update() {
 }
 
 void Game::RenderBegin() {
+
+	// 리소스와 렌더링 파이프라인을 묶어주기 위해 _deviceContext를 사용해야한다.
+	// IA(Input Assembler) - VS(Vertex Shader) - RS(Rasterizer Stage) - PS(Pixel Shader) - OM(Output Merger)
+	// 접두사를 통해서 어떤 Stage에 작업을 요청했는지 알 수 있다.
+
+	// 여기에다가 그림을 그려주세요!
+	_deviceContext->OMSetRenderTargets(1, _renderTargetView.GetAddressOf(), nullptr);
+
+	// 초기 색은 _clearColor 색상이에요!
+	_deviceContext->ClearRenderTargetView(_renderTargetView.Get(), _clearColor);
+
+	// 우리가 바라볼 화면 정보에요.
+	_deviceContext->RSSetViewports(1, &_viewport);
 }
 
 void Game::RenderEnd() {
+
+	// Present: 제출하다.
+	// [ 후면 ] --> [ 전면 ]
+	// 후면 버퍼에 입력한 것들을 전면 버퍼에 복사해준 후 화면에 보여달라!
+	HRESULT hr = _swapChain->Present(1, 0);
+	CHECK(hr);
+
+
 }
 
 void Game::CreateDeviceAndSwapChain() {
@@ -123,4 +153,13 @@ void Game::CreateRenderTargetView() {
 	CHECK(hr);
 
 
+}
+
+void Game::SetViewPort() {
+	_viewport.TopLeftX = 0.0f;
+	_viewport.TopLeftY = 0.0f;
+	_viewport.Width = static_cast<float>(_width);
+	_viewport.Height = static_cast<float>(_height);
+	_viewport.MinDepth = 0.0f;
+	_viewport.MaxDepth = 1.0f;
 }

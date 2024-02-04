@@ -24,6 +24,7 @@ private:
 private:
 	void CreateDeviceAndSwapChain();
 	void CreateRenderTargetView();
+	void SetViewPort();
 private:
 	HWND _hwnd{};
 	uint32 _width{};
@@ -41,7 +42,7 @@ private:
 	 * 1. 레퍼런스 카운팅 방식을 사용한다.
 	 * _device->AddRef();
 	 * _device->Release();
-	 * 
+	 *
 	 * 2. 실수로 레퍼런스 카운팅을 잘못 계산한경우 어떻게 될까?
 	 * 메모리 누수 문제가 발생할 수 있다.
 	 * 따라서 수동으로 레퍼런스 카운트를 관리하는건 부적절하다.
@@ -84,12 +85,17 @@ private:
 	// [ 후면 ] --> [ 전면 ]
 	// [ 전면 ] <-- [ 후면 ]
 	// 처럼 전면이 후면이 되었다가 왔다갔다하면서 보여주는 방식도 존재한다. (이런게 있다는걸 알아두자.)
-	
+
 	ComPtr<IDXGISwapChain> _swapChain;
 
 	// RenderTargetView
 	// 스왑체인에 후면 버퍼를 만들어 달라고 해서, 더블 버퍼링 지원까지는 완료했다.
 	// 후면 버퍼에다가 그림을 그려달라고 요청을 해야하는데 그 후면 버퍼를 가리키는 녀석이다.
+	// 즉, 우리가 최종적으로 그림을 그릴 대상을 의미한다.
 	// https://learn.microsoft.com/en-us/windows/uwp/graphics-concepts/render-target-view--rtv-
 	ComPtr<ID3D11RenderTargetView> _renderTargetView;
+
+	// 뷰포트
+	D3D11_VIEWPORT _viewport;
+	float _clearColor[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
 };
