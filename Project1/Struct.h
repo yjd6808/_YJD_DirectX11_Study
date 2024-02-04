@@ -9,4 +9,8 @@
 #pragma once
 
 
-
+struct Vertex
+{
+	Vec3 Position;
+	Color Color;
+};

@@ -16,6 +16,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="91. Shaders">
+      <UniqueIdentifier>{a4ab1474-3a35-4559-aa28-5311da1ced0d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -69,5 +72,10 @@
     <Image Include="Project1.ico">
       <Filter>99. Resources</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="default.hlsl">
+      <Filter>91. Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

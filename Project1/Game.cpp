@@ -26,6 +26,12 @@ void Game::Init(HWND hwnd) {
 	CreateDeviceAndSwapChain();
 	CreateRenderTargetView();
 	SetViewPort();
+
+	CreateGeometry();		// 도형을 만든다.
+	CreateVS();				
+	CreateInputLayout();
+	CreatePS();
+	
 }
 
 void Game::Render() {
@@ -34,6 +40,33 @@ void Game::Render() {
 	RenderBegin();
 
 	// 여기서 여러가지 물체들을 그린다.
+	{
+		// IA단계에서 할일
+		uint32 stride = sizeof(Vertex);
+		uint32 offset = 0;
+
+		// 렌더링 파이프라인 그림에서 VertexBuffer를 IA와 연결하는 단계를 수행해준다.
+		_deviceContext->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
+		// VertexBuffer는 데이터 쪼가리일 뿐이므로 inputLayout으로 어떻게 묘사되어있는지 알려줘야한다.
+		_deviceContext->IASetInputLayout(_inputLayout.Get());
+		// 정점을 어떻게 연결할지, 보통 삼각형으로 연결하므로 거의 항상 D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST를 전달한다.
+		_deviceContext->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+
+		// VS단계에서 할일
+		// 우리가 셰이더 파일 읽어와서 메모리에 들고있는데 이 데이터를 가지고 작업을 진행해줘
+		_deviceContext->VSSetShader(_vertexShader.Get(), nullptr, 0);
+
+
+		// RS단계에서 할일
+
+		// PS단계에서 할일
+		_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
+
+		// OM
+		// 물체를 그려달라고 요청한다.
+		_deviceContext->Draw(_vertices.size(), 0);
+	}
 
 	// 그림을 다 그렸으니 제출한다.
 	RenderEnd();
@@ -162,4 +195,101 @@ void Game::SetViewPort() {
 	_viewport.Height = static_cast<float>(_height);
 	_viewport.MinDepth = 0.0f;
 	_viewport.MaxDepth = 1.0f;
+}
+
+void Game::CreateGeometry() {
+	HRESULT hr;
+	// 버텍스 정보
+	{
+		_vertices.resize(3);
+
+		// 정점 설정 순서는 반시계 방향
+		_vertices[0].Position = { -0.5f, -0.5f, 0.0f };
+		_vertices[0].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
+
+		_vertices[1].Position = { 0, 0.5f, 0 };
+		_vertices[1].Color = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+		_vertices[2].Position = { 0.5f, -0.5f, 0 };
+		_vertices[2].Color = { 0.0f, 0.0f, 1.0f, 1.0f };
+	}
+	
+
+	// 메모리 데이터를 GPU에 메모리에 전달하기 위함
+	// 버텍스 버퍼
+	{
+		D3D11_BUFFER_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+
+		// 이 버퍼는 어떤 용도로 사용할 것인가?
+		// D3D11_USAGE_DEFAULT: GPU만 읽고 쓸 수 있다.
+		// D3D11_USAGE_IMMUTABLE: GPU만 읽을 수 있다.
+		// D3D11_USAGE_DYNAMIC: CPU는 쓸 수 있고 GPU는 읽을수만 있다.
+		// immutable로 세팅한 이유는 우리가 처음 다이렉트X를 초기화하면서 도형을 버퍼에 기록해놓고 중간에 변경하지 않을 것이기 때문
+		desc.Usage = D3D11_USAGE_IMMUTABLE;
+		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;	// 우리가 이 버퍼를 버텍스 버퍼로 사용하겠다는 용도를 적어준다.
+		desc.ByteWidth = sizeof(Vertex) * _vertices.size(); // 버텍스 버퍼의 크기를 알려준다.
+
+		// _vertexBuffer로 어떤 버퍼의 데이터를 복사해올 것인가?
+		D3D11_SUBRESOURCE_DATA data;
+		ZeroMemory(&data, sizeof(data));
+		data.pSysMem = _vertices.data(); // _vertices의 데이터를 복사해주기위함
+
+		// desc와 data를 바탕으로 GPU가 다루는 버텍스 버퍼를 생성한다.
+		hr = _device->CreateBuffer(&desc, &data, _vertexBuffer.GetAddressOf());
+		CHECK(hr);
+	}
+}
+
+void Game::CreateInputLayout() {
+
+	// GPU에서 봤을 때는 아직 VertexBuffer정보도 데이터쪼가리일 뿐이다.
+	// 어떤 녀석인지 묘사해주기 위함.
+
+	// Vertex::Position 멤버가 12바이트를 차지하고 있으므로 Color는 12
+	D3D11_INPUT_ELEMENT_DESC layouts[] = {
+		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 0,	D3D11_INPUT_PER_VERTEX_DATA },
+		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 12,	D3D11_INPUT_PER_VERTEX_DATA }
+	};
+	const int32 count = sizeof(layouts) / sizeof(D3D11_INPUT_ELEMENT_DESC);
+	_device->CreateInputLayout(layouts, count, _vsBlob->GetBufferPointer(), _vsBlob->GetBufferSize(), _inputLayout.GetAddressOf());
+}
+
+void Game::CreateVS() {
+
+	// Default.hlsl을 컴파일해서 _vsBlob에 담아준다
+	LoadShaderFromFile(L"default.hlsl", "VS", "vs_5_0", _vsBlob);
+	HRESULT hr = _device->CreateVertexShader(_vsBlob->GetBufferPointer(), _vsBlob->GetBufferSize(), nullptr, _vertexShader.GetAddressOf());
+	CHECK(hr);
+}
+
+void Game::CreatePS() {
+	// Default.hlsl을 컴파일해서 _psBlob에 담아준다
+	LoadShaderFromFile(L"default.hlsl", "PS", "ps_5_0", _psBlob);
+	HRESULT hr = _device->CreatePixelShader(_psBlob->GetBufferPointer(), _psBlob->GetBufferSize(), nullptr, _pixelShader.GetAddressOf());
+	CHECK(hr);
+}
+
+void Game::LoadShaderFromFile(const wstring& path, const string& entryMethodName, const string& version, ComPtr<ID3DBlob>& blob) {
+
+	// d3dcompiler.lib이 제공해주는 함수
+	// 디버그 용도이고, 최적화는 건너뛰겠다.
+	const uint32 compileFlag = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+
+	// path: 파일 명
+	// entryMethodName: 진입 함수 명
+	// verison: 셰이더 모델 버전
+	// blob: 셰이더 컴파일 결과가 저장될 Blob객체
+	HRESULT hr = ::D3DCompileFromFile(
+		path.c_str(),
+		nullptr,
+		D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		entryMethodName.c_str(),
+		version.c_str(),
+		compileFlag,
+		0,
+		blob.GetAddressOf(),
+		nullptr
+	);
+	CHECK(hr);
 }

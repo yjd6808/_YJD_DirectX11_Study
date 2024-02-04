@@ -26,6 +26,14 @@ private:
 	void CreateRenderTargetView();
 	void SetViewPort();
 private:
+	void CreateGeometry();
+	void CreateInputLayout();
+
+	void CreateVS();
+	void CreatePS();
+
+	void LoadShaderFromFile(const wstring& path, const string& name, const string& version, ComPtr<ID3DBlob>& blob);
+private:
 	HWND _hwnd{};
 	uint32 _width{};
 	uint32 _height{};
@@ -98,4 +106,23 @@ private:
 	// 뷰포트
 	D3D11_VIEWPORT _viewport;
 	float _clearColor[4] = { 0.5f, 0.5f, 0.5f, 0.5f };
+
+private:
+	// 도형
+	// [ CPU <-> RAM ]: 아직까지는 RAM에 저장된 정보이다.
+	// [ GPU <-> VRAM ]
+	vector<Vertex> _vertices;
+
+	// RAM 저장된 데이터를 VRAM으로 복사해주기 위한 버퍼이다.
+	ComPtr<ID3D11Buffer> _vertexBuffer;
+	ComPtr<ID3D11InputLayout> _inputLayout;
+
+
+	// VS(버텍스 셰이더)
+	ComPtr<ID3D11VertexShader> _vertexShader;
+	ComPtr<ID3DBlob> _vsBlob;
+
+	// PS(픽셀 셰이더)
+	ComPtr<ID3D11PixelShader> _pixelShader;
+	ComPtr<ID3DBlob> _psBlob;
 };
