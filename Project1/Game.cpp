@@ -66,6 +66,7 @@ void Game::CreateDeviceAndSwapChain() {
 		desc.BufferCount = 1;
 
 		desc.Windowed = true;
+		desc.OutputWindow = _hwnd;
 		desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	}
 
