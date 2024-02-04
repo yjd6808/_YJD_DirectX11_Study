@@ -22,6 +22,8 @@ void Game::Init(HWND hwnd) {
 	_hwnd = hwnd;
 	_width = GMinSizeX;
 	_height = GMinSizeY;
+
+	CreateDeviceAndSwapChain();
 }
 
 void Game::Render() {
@@ -30,4 +32,7 @@ void Game::Render() {
 
 void Game::Update() {
 	
+}
+
+void Game::CreateDeviceAndSwapChain() {
 }
