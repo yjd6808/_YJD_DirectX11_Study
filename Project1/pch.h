@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 
 #include "Types.h"
@@ -17,21 +17,19 @@ using namespace std;
 #include <assert.h>
 
 // DirectX
-// ¿¾³¯¿¡´Â ´ÙÀÌ·ºÆ®X ¶óÀÌºê·¯¸®¸¦ ¸µÅ©ÇØÁÖµµ·Ï ¼³Á¤À» Á÷Á¢ Ãß°¡ÇØÁà¾ßÇß´Âµ¥
-// À©µµ¿ì10 ÀÌÈÄ¿¡´Â ¿ö³« ´ÙÀÌ·ºÆ®°¡ ¹ü¿ë¼º ÀÖ°Ô »ç¿ëµÇ´Â ¶óÀÌºê·¯¸®¶ó¼­ ¾Æ¿¹ SDK¿¡ Æ÷ÇÔ½ÃÄ×´Ù.
+// ì˜›ë‚ ì—ëŠ” ë‹¤ì´ë ‰íŠ¸X ë¼ì´ë¸ŒëŸ¬ë¦¬ë¥¼ ë§í¬í•´ì£¼ë„ë¡ ì„¤ì •ì„ ì§ì ‘ ì¶”ê°€í•´ì¤˜ì•¼í–ˆëŠ”ë°
+// ìœˆë„ìš°10 ì´í›„ì—ëŠ” ì›Œë‚™ ë‹¤ì´ë ‰íŠ¸ê°€ ë²”ìš©ì„± ìˆê²Œ ì‚¬ìš©ë˜ëŠ” ë¼ì´ë¸ŒëŸ¬ë¦¬ë¼ì„œ ì•„ì˜ˆ SDKì— í¬í•¨ì‹œì¼°ë‹¤.
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <wrl.h>
 #include <DirectXMath.h>
 
-// ÅØ½ºÃÄ¸¦ ·ÎµùÇØÁÖ´Â ¶óÀÌºê·¯¸®´Â DirectTex
-// https://github.com/microsoft/DirectXTex ³»·Á¹ŞÀº ÈÄ  DirectXTex_Desktop_2022.sln ½ÇÇàÇØ¼­ ¶óÀÌºê·¯¸® »Ì´Â´Ù.
-// DirectXTex.h, DirectXTex.ini ÆÄÀÏÀº ÀÎÅ¬·çµå Çì´õÆÄÀÏÀÌ¹Ç·Î º¹»çÇØ¼­ °¡Á®¿Í¼­ ¾¸
+// í…ìŠ¤ì³ë¥¼ ë¡œë”©í•´ì£¼ëŠ” ë¼ì´ë¸ŒëŸ¬ë¦¬ëŠ” DirectTex
+// https://github.com/microsoft/DirectXTex ë‚´ë ¤ë°›ì€ í›„  DirectXTex_Desktop_2022.sln ì‹¤í–‰í•´ì„œ ë¼ì´ë¸ŒëŸ¬ë¦¬ ë½‘ëŠ”ë‹¤.
+// DirectXTex.h, DirectXTex.ini íŒŒì¼ì€ ì¸í´ë£¨ë“œ í—¤ë”íŒŒì¼ì´ë¯€ë¡œ ë³µì‚¬í•´ì„œ ê°€ì ¸ì™€ì„œ ì”€
 #include "DirectXTex/DirectXTex.h"
 #include "DirectXTex/DirectXTex.inl"
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "d3dcompiler.lib")
-#pragma comment(lib, "DirectXTex.lib")
+#define CHECK(p)		assert(SUCCEEDED(p))

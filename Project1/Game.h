@@ -1,4 +1,4 @@
-/*
+﻿/*
  * 작성자: 윤정도
  * 생성일: 2/3/2024 9:23:29 PM
  * =====================
@@ -61,7 +61,9 @@ private:
 	// DirectX Graphics Infrastructure
 	// 다이렉트X는 그래픽 기술이 발전함에따라 버전이 9, 11, 12와 같이 진화했다.
 	// 이때 발전이 느린 공통된 기능들이 존재하는데 이런 기능들을 DXGI로 빼서 관리한다는 개념이다.
-	// 이중 제일 중요하게 사용되는게 스왑체인이라는 녀석이다 
+	// 이중 제일 중요하게 사용되는게 스왑체인이라는 녀석이다
+	// 블로그: https://minusi.tistory.com/entry/DXGI-%EA%B0%9C%EC%9A%94DirectX-Graphics-Infrastructure-Overview
+	// MS문서: https://learn.microsoft.com/ko-kr/windows/win32/direct3ddxgi/d3d10-graphics-programming-guide-dxgi
 	// IDXGISwapChain는 더블버퍼링 처리를 위해 쓴다
 	// 더블버퍼링: 싱글버퍼링일 경우 화면을 출력할 때 변하는 내용이 있으면 해당 장면을 지우고 새로 그리는데, 이때 화면이 깜빡거리는 현상이 발생한다.
 	// 이 깜빡임을 없애기 위해 미리 그려둔 화면을 띄워주는 방식을 더블버퍼링이라고 한다.
@@ -78,7 +80,6 @@ private:
 	// [ 후면 ] --> [ 전면 ]
 	// [ 전면 ] <-- [ 후면 ]
 	// 처럼 전면이 후면이 되었다가 왔다갔다하면서 보여주는 방식도 존재한다. (이런게 있다는걸 알아두자.)
-	// 블로그: https://minusi.tistory.com/entry/DXGI-%EA%B0%9C%EC%9A%94DirectX-Graphics-Infrastructure-Overview
-	// MS문서: https://learn.microsoft.com/ko-kr/windows/win32/direct3ddxgi/d3d10-graphics-programming-guide-dxgi
+	
 	ComPtr<IDXGISwapChain> _swapChain;
 };
