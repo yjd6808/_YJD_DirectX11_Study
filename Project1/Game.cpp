@@ -34,6 +34,12 @@ void Game::Update() {
 	
 }
 
+void Game::RenderBegin() {
+}
+
+void Game::RenderEnd() {
+}
+
 void Game::CreateDeviceAndSwapChain() {
 
 	// 구조체가 정말 복잡하다
@@ -48,6 +54,8 @@ void Game::CreateDeviceAndSwapChain() {
 		// RefreshRate: 화면 주사율과 관련된 옵션
 		desc.BufferDesc.RefreshRate.Numerator = 60;		
 		desc.BufferDesc.RefreshRate.Denominator = 1;
+
+		// 전면/후면 버퍼의 각 픽셀의 색상 컬러의 포맷을 의미한다.
 		desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		// 일단 넘어가자.
@@ -99,4 +107,20 @@ void Game::CreateDeviceAndSwapChain() {
 
 	
 	CHECK(hr);
+}
+
+void Game::CreateRenderTargetView() {
+	HRESULT hr;
+	ID3D11Texture2D* pBackBuffer = nullptr;
+
+	// 스왑체인에서 0번째 백버퍼를 찾아서 pBackBuffer에 저장한다.
+	// __uuidof는 COM 오브젝트는 타입 저마다 id가 있는데 그 정보를 얻을 때 사용하는거다.
+	hr = _swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&pBackBuffer);
+	CHECK(hr);
+
+	hr = _device->CreateRenderTargetView(pBackBuffer, nullptr, _renderTargetView.GetAddressOf());
+	pBackBuffer->Release();
+	CHECK(hr);
+
+
 }

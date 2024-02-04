@@ -17,13 +17,17 @@ public:
 	void Init(HWND hwnd);
 	void Render();
 	void Update();
+
+private:
+	void RenderBegin();
+	void RenderEnd();
+private:
+	void CreateDeviceAndSwapChain();
+	void CreateRenderTargetView();
 private:
 	HWND _hwnd{};
 	uint32 _width{};
 	uint32 _height{};
-
-private:
-	void CreateDeviceAndSwapChain();
 
 
 private:
@@ -82,4 +86,10 @@ private:
 	// 처럼 전면이 후면이 되었다가 왔다갔다하면서 보여주는 방식도 존재한다. (이런게 있다는걸 알아두자.)
 	
 	ComPtr<IDXGISwapChain> _swapChain;
+
+	// RenderTargetView
+	// 스왑체인에 후면 버퍼를 만들어 달라고 해서, 더블 버퍼링 지원까지는 완료했다.
+	// 후면 버퍼에다가 그림을 그려달라고 요청을 해야하는데 그 후면 버퍼를 가리키는 녀석이다.
+	// https://learn.microsoft.com/en-us/windows/uwp/graphics-concepts/render-target-view--rtv-
+	ComPtr<ID3D11RenderTargetView> _renderTargetView;
 };
