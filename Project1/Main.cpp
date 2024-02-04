@@ -1,13 +1,10 @@
-﻿// Project1.cpp : Defines the entry point for the application.
-//
-
-#include "pch.h"
+﻿#include "pch.h"
 #include "framework.h"
 #include "Main.h"
 #include "Game.h"
 
 // Global Variables:
-HINSTANCE hInst;                                // current instance
+HINSTANCE hInst; // current instance
 HWND hWnd;
 
 // Forward declarations of functions included in this code module:

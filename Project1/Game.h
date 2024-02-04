@@ -25,4 +25,33 @@ private:
 private:
 	// DirectX
 
+	/*
+	 * COM 객체라고 부르는 녀석들
+	 * I는 인터페이스 약자
+	 * ID3D11Device* _device;
+	 * ID3D11DeviceContext* _deviceContext;
+	 * 1. 레퍼런스 카운팅 방식을 사용한다.
+	 * _device->AddRef();
+	 * _device->Release();
+	 * 
+	 * 2. 실수로 레퍼런스 카운팅을 잘못 계산한경우 어떻게 될까?
+	 * 메모리 누수 문제가 발생할 수 있다.
+	 * 따라서 수동으로 레퍼런스 카운트를 관리하는건 부적절하다.
+	 * 스마트 포인터방식으로 관리하도록 해야한다.
+	 * 이를 위해 ComPtr이라는 스마트 포인터 객체를 제공해준다.
+	 * ComPtr클래스는 wrl헤더의 Microsoft::WRL 네임스페이스에 속해있다.
+	 *
+	 * 그렇다면 중요한건 ID3D11Device와 ID3D11DeviceContext는 무슨일을 하는것인가?
+	 * 우리가 사용하는 GPU 모델은 몇백개에 달한다.
+	 * 각 GPU마다 스펙이 달라서 우리가 신경써서 개발하는건 불가능하다.
+	 * 즉 ID3D11Device와 ID3D11DeviceContext는 개발자가 GPU 모델 상관없이 손쉽게 대화할 수 있도록
+	 * 다이렉트X가 제공해주는 인터페이스이다.
+	 * 이 2가지 인터페이스는 개발자가 사용하는 다이렉트X를 총괄하는 총 사령관이라고 생각하면된다.
+	 * ID3D11Device의 함수를 쭉 살펴보면 Create으로 시작하는 함수가 많다. -> 즉 유닛 생산을 전문으로 담당하는 녀석
+	 * ID3D11DeviceContext: 이미 만들어진 리소스를 가지고 렌더링 파이프라인에 연결할 때 사용하는 녀석. -> 유닛에게 명령을 내리거나 하라고 시킬 때 사용
+	 */
+
+	ComPtr<ID3D11Device> _device;
+	ComPtr<ID3D11DeviceContext> _deviceContext;
+
 };
