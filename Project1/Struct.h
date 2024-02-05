@@ -12,5 +12,6 @@
 struct Vertex
 {
 	Vec3 Position;
-	Color Color;
+	// Color Color;
+	Vec2 UV;
 };

@@ -32,7 +32,9 @@ private:
 	void CreateVS();
 	void CreatePS();
 
-	void LoadShaderFromFile(const wstring& path, const string& name, const string& version, ComPtr<ID3DBlob>& blob);
+	void CreateSRV(); //Shader Resource View
+
+	void LoadShaderFromFile(const wstring& path, const string& entryMethodName, const string& version, ComPtr<ID3DBlob>& blob);
 private:
 	HWND _hwnd{};
 	uint32 _width{};
@@ -112,11 +114,11 @@ private:
 	// [ CPU <-> RAM ]: 아직까지는 RAM에 저장된 정보이다.
 	// [ GPU <-> VRAM ]
 	vector<Vertex> _vertices;
+	ComPtr<ID3D11Buffer> _vertexBuffer;	// RAM 저장된 데이터를 VRAM으로 복사해주기 위한 버퍼이다.
+	vector<uint32> _indices;
+	ComPtr<ID3D11Buffer> _indexBuffer;
 
-	// RAM 저장된 데이터를 VRAM으로 복사해주기 위한 버퍼이다.
-	ComPtr<ID3D11Buffer> _vertexBuffer;
 	ComPtr<ID3D11InputLayout> _inputLayout;
-
 
 	// VS(버텍스 셰이더)
 	ComPtr<ID3D11VertexShader> _vertexShader;
@@ -125,4 +127,7 @@ private:
 	// PS(픽셀 셰이더)
 	ComPtr<ID3D11PixelShader> _pixelShader;
 	ComPtr<ID3DBlob> _psBlob;
+
+	// SRV
+	ComPtr<ID3D11ShaderResourceView> _shaderResourceView;
 };

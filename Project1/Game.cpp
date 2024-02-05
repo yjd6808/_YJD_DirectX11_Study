@@ -31,7 +31,8 @@ void Game::Init(HWND hwnd) {
 	CreateVS();				
 	CreateInputLayout();
 	CreatePS();
-	
+
+	CreateSRV();
 }
 
 void Game::Render() {
@@ -47,6 +48,7 @@ void Game::Render() {
 
 		// 렌더링 파이프라인 그림에서 VertexBuffer를 IA와 연결하는 단계를 수행해준다.
 		_deviceContext->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
+		_deviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		// VertexBuffer는 데이터 쪼가리일 뿐이므로 inputLayout으로 어떻게 묘사되어있는지 알려줘야한다.
 		_deviceContext->IASetInputLayout(_inputLayout.Get());
 		// 정점을 어떻게 연결할지, 보통 삼각형으로 연결하므로 거의 항상 D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST를 전달한다.
@@ -62,10 +64,12 @@ void Game::Render() {
 
 		// PS단계에서 할일
 		_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
+		_deviceContext->PSSetShaderResources(0, 1, _shaderResourceView.GetAddressOf());
 
 		// OM
 		// 물체를 그려달라고 요청한다.
-		_deviceContext->Draw(_vertices.size(), 0);
+		// _deviceContext->Draw(_vertices.size(), 0);
+		_deviceContext->DrawIndexed(_indices.size(), 0, 0);
 	}
 
 	// 그림을 다 그렸으니 제출한다.
@@ -201,17 +205,26 @@ void Game::CreateGeometry() {
 	HRESULT hr;
 	// 버텍스 정보
 	{
-		_vertices.resize(3);
+		_vertices.resize(4);
 
 		// 정점 설정 순서는 반시계 방향
+		// 13
+		// 02
 		_vertices[0].Position = { -0.5f, -0.5f, 0.0f };
-		_vertices[0].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
+		// _vertices[0].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
+		_vertices[0].UV = { 0.0f, 1.0f };
 
-		_vertices[1].Position = { 0, 0.5f, 0 };
-		_vertices[1].Color = { 0.0f, 1.0f, 0.0f, 1.0f };
+		_vertices[1].Position = { -0.5, 0.5f, 0 };
+		// _vertices[1].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
+		_vertices[1].UV = { 0.0f, 0.0f };
 
 		_vertices[2].Position = { 0.5f, -0.5f, 0 };
-		_vertices[2].Color = { 0.0f, 0.0f, 1.0f, 1.0f };
+		// _vertices[2].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
+		_vertices[2].UV = { 1.0f, 1.0f };
+
+		_vertices[3].Position = { 0.5f, 0.5f, 0 };
+		// _vertices[3].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
+		_vertices[3].UV = { 1.0f, 0.0f };
 	}
 	
 
@@ -239,6 +252,31 @@ void Game::CreateGeometry() {
 		hr = _device->CreateBuffer(&desc, &data, _vertexBuffer.GetAddressOf());
 		CHECK(hr);
 	}
+
+
+	// 인덱스 정보
+	{
+		_indices = { 0, 1, 2, 2, 1, 3 };	// 시계 방향을 골랐으면, 똑같이 유지해줘야한다.
+	}
+
+	// 인덱스 버퍼
+	{
+		D3D11_BUFFER_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+
+		desc.Usage = D3D11_USAGE_IMMUTABLE;
+		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;	// 우리가 이 버퍼를 버텍스 버퍼로 사용하겠다는 용도를 적어준다.
+		desc.ByteWidth = sizeof(uint32) * _indices.size(); // 버텍스 버퍼의 크기를 알려준다.
+
+		// _vertexBuffer로 어떤 버퍼의 데이터를 복사해올 것인가?
+		D3D11_SUBRESOURCE_DATA data;
+		ZeroMemory(&data, sizeof(data));
+		data.pSysMem = _indices.data(); // _vertices의 데이터를 복사해주기위함
+
+		// desc와 data를 바탕으로 GPU가 다루는 버텍스 버퍼를 생성한다.
+		hr = _device->CreateBuffer(&desc, &data, _indexBuffer.GetAddressOf());
+		CHECK(hr);
+	}
 }
 
 void Game::CreateInputLayout() {
@@ -249,7 +287,8 @@ void Game::CreateInputLayout() {
 	// Vertex::Position 멤버가 12바이트를 차지하고 있으므로 Color는 12
 	D3D11_INPUT_ELEMENT_DESC layouts[] = {
 		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 0,	D3D11_INPUT_PER_VERTEX_DATA },
-		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 12,	D3D11_INPUT_PER_VERTEX_DATA }
+		// { "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 12,	D3D11_INPUT_PER_VERTEX_DATA }
+		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 12,	D3D11_INPUT_PER_VERTEX_DATA }
 	};
 	const int32 count = sizeof(layouts) / sizeof(D3D11_INPUT_ELEMENT_DESC);
 	_device->CreateInputLayout(layouts, count, _vsBlob->GetBufferPointer(), _vsBlob->GetBufferSize(), _inputLayout.GetAddressOf());
@@ -267,6 +306,17 @@ void Game::CreatePS() {
 	// Default.hlsl을 컴파일해서 _psBlob에 담아준다
 	LoadShaderFromFile(L"default.hlsl", "PS", "ps_5_0", _psBlob);
 	HRESULT hr = _device->CreatePixelShader(_psBlob->GetBufferPointer(), _psBlob->GetBufferSize(), nullptr, _pixelShader.GetAddressOf());
+	CHECK(hr);
+}
+
+void Game::CreateSRV() {
+	// Shader에 리소스로 사용할 수 있는 뷰다. (Shader Resource View)
+	DirectX::TexMetadata md;
+	DirectX::ScratchImage img;
+	HRESULT hr = ::LoadFromWICFile(L"apple.png", WIC_FLAGS_NONE, &md, img);
+	CHECK(hr);
+
+	hr = ::CreateShaderResourceView(_device.Get(), img.GetImages(), img.GetImageCount(), md, _shaderResourceView.GetAddressOf());
 	CHECK(hr);
 }
 

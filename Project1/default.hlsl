@@ -11,14 +11,16 @@ struct VS_INPUT
 {
 	// 이 이름은 우리가 이전에 InputLayout에 작성한 이름과 맞춰주면 된다.
 	float4 position : POSITION;
-	float4 color: COLOR;
+	// float4 color: COLOR;
+	float2 uv: TEXCOORD;
 
 };
 
 struct VS_OUTPUT
 {
 	float4 position : SV_POSITION;
-	float4 color : COLOR;
+	// float4 color : COLOR;
+	float2 uv : TEXCOORD;
 };
 
 // IA -> VS -> RS -> PS -> OM
@@ -29,21 +31,22 @@ VS_OUTPUT VS(VS_INPUT input)
 	// 다다음주쯤에는 여러 수학을 활용해서 프로젝션등 처리를 해주지만 우선 처음 배우는 단계이니 그냥 반환한다.
 	VS_OUTPUT output;
 	output.position = input.position;
-	output.color = input.color;
+	// output.color = input.color;
+	output.uv = input.uv;
 	return output;
 }
+
+Texture2D texture0 : register(t0);
+SamplerState sampler0 : register(s0);
+
 
 // 모든 픽셀에 대해서 처리되는 단계
 // 조명처리 같은걸 할때
 // 각 rgb색상에 *= 0.45f를 곱해주면 많이 어두워지는걸 알 수 있다. (정말 모든 픽셀마다 적용되는지 검사하는 용도)
 float4 PS(VS_OUTPUT input) : SV_Target
 {
-	// input.color[0] *= 0.45f;
-	// input.color[1] *= 0.45f;
-	// input.color[2] *= 0.45f;
-	// input.color[3] *= 0.45f;
-		
-	return input.color;
+	float4 color = texture0.Sample(sampler0, input.uv);
+	return color;
 }
 
 // 이렇게 작성하고 처음 빌드를 하면 main 진입점을 찾지 못했다는 오류가 뜬다.
