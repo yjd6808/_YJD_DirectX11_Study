@@ -33,6 +33,8 @@ void Game::Init(HWND hwnd) {
 	CreatePS();
 
 	CreateSRV();
+
+	CreateConstantBuffer();
 }
 
 void Game::Render() {
@@ -58,6 +60,7 @@ void Game::Render() {
 		// VS단계에서 할일
 		// 우리가 셰이더 파일 읽어와서 메모리에 들고있는데 이 데이터를 가지고 작업을 진행해줘
 		_deviceContext->VSSetShader(_vertexShader.Get(), nullptr, 0);
+		_deviceContext->VSSetConstantBuffers(0, 1, _constantBuffer.GetAddressOf());
 
 
 		// RS단계에서 할일
@@ -77,7 +80,22 @@ void Game::Render() {
 }
 
 void Game::Update() {
-	
+
+	_transformData.offset.x += 0.003f;
+	_transformData.offset.y += 0.003f;
+
+	D3D11_MAPPED_SUBRESOURCE subResource;
+	ZeroMemory(&subResource, sizeof(subResource));
+
+	// Map으로 뚜겅을 연다. 이제 constantBuffer에 데이터를 쓸 수 있다.
+	// constantBuffer의 메모리 위치를 의미하는 녀석이 subResource이다.
+	_deviceContext->Map(_constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &subResource);
+
+	// CPU -> GPU 데이터쓰기
+	::memcpy(subResource.pData, &_transformData, sizeof(TransformData));
+
+	// Unamp으로 뚜껑을 닫는다. 더이상 수정 불가능하다.
+	_deviceContext->Unmap(_constantBuffer.Get(), 0);
 }
 
 void Game::RenderBegin() {
@@ -317,6 +335,17 @@ void Game::CreateSRV() {
 	CHECK(hr);
 
 	hr = ::CreateShaderResourceView(_device.Get(), img.GetImages(), img.GetImageCount(), md, _shaderResourceView.GetAddressOf());
+	CHECK(hr);
+}
+
+void Game::CreateConstantBuffer() {
+	D3D11_BUFFER_DESC desc;
+	ZeroMemory(&desc, sizeof(desc));
+	desc.Usage = D3D11_USAGE_DYNAMIC; // CPU_WRITE + GPU_READ
+	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	desc.ByteWidth = sizeof(TransformData);
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	HRESULT hr = _device->CreateBuffer(&desc, nullptr, _constantBuffer.GetAddressOf());
 	CHECK(hr);
 }
 

@@ -15,3 +15,9 @@ struct Vertex
 	// Color Color;
 	Vec2 UV;
 };
+
+struct TransformData
+{
+	Vec3 offset;
+	float dummy;	// float4를 맞춰주기 위함
+};

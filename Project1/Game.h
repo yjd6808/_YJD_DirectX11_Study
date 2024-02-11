@@ -34,6 +34,8 @@ private:
 
 	void CreateSRV(); //Shader Resource View
 
+	void CreateConstantBuffer();
+
 	void LoadShaderFromFile(const wstring& path, const string& entryMethodName, const string& version, ComPtr<ID3DBlob>& blob);
 private:
 	HWND _hwnd{};
@@ -130,4 +132,8 @@ private:
 
 	// SRV
 	ComPtr<ID3D11ShaderResourceView> _shaderResourceView;
+private:
+	// 상수버퍼
+	TransformData _transformData;
+	ComPtr<ID3D11Buffer> _constantBuffer;
 };

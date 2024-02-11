@@ -23,6 +23,11 @@ struct VS_OUTPUT
 	float2 uv : TEXCOORD;
 };
 
+cbuffer TransformData : register(b0)
+{
+	float4 offset;
+}
+
 // IA -> VS -> RS -> PS -> OM
 // 우리가 Game.cpp의 CreateInputLayout에서 만든 layout이 여기로 넘어온다.
 // 이 함수는 정점 단위로 시행된다.
@@ -30,7 +35,7 @@ VS_OUTPUT VS(VS_INPUT input)
 {
 	// 다다음주쯤에는 여러 수학을 활용해서 프로젝션등 처리를 해주지만 우선 처음 배우는 단계이니 그냥 반환한다.
 	VS_OUTPUT output;
-	output.position = input.position;
+	output.position = input.position + offset;
 	// output.color = input.color;
 	output.uv = input.uv;
 	return output;
