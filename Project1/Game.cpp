@@ -32,6 +32,9 @@ void Game::Init(HWND hwnd) {
 	CreateInputLayout();
 	CreatePS();
 
+	CreateRasterizerState();
+	CreateSamplerState();
+	CreateBlendState();
 	CreateSRV();
 
 	CreateConstantBuffer();
@@ -64,12 +67,16 @@ void Game::Render() {
 
 
 		// RS단계에서 할일
+		_deviceContext->RSSetState(_rasterizerState.Get());
 
 		// PS단계에서 할일
 		_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
 		_deviceContext->PSSetShaderResources(0, 1, _shaderResourceView.GetAddressOf());
+		_deviceContext->PSSetSamplers(0, 1, _samplerState.GetAddressOf());
 
 		// OM
+		_deviceContext->OMSetBlendState(_blendState.Get(), nullptr, 0xffffffff);
+
 		// 물체를 그려달라고 요청한다.
 		// _deviceContext->Draw(_vertices.size(), 0);
 		_deviceContext->DrawIndexed(_indices.size(), 0, 0);
@@ -81,8 +88,8 @@ void Game::Render() {
 
 void Game::Update() {
 
-	_transformData.offset.x += 0.003f;
-	_transformData.offset.y += 0.003f;
+	// _transformData.offset.x += 0.003f;
+	// _transformData.offset.y += 0.003f;
 
 	D3D11_MAPPED_SUBRESOURCE subResource;
 	ZeroMemory(&subResource, sizeof(subResource));
@@ -223,6 +230,8 @@ void Game::CreateGeometry() {
 	HRESULT hr;
 	// 버텍스 정보
 	{
+		constexpr float UV = 2.0f;
+
 		_vertices.resize(4);
 
 		// 정점 설정 순서는 반시계 방향
@@ -230,7 +239,7 @@ void Game::CreateGeometry() {
 		// 02
 		_vertices[0].Position = { -0.5f, -0.5f, 0.0f };
 		// _vertices[0].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		_vertices[0].UV = { 0.0f, 1.0f };
+		_vertices[0].UV = { 0.0f, UV };
 
 		_vertices[1].Position = { -0.5, 0.5f, 0 };
 		// _vertices[1].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -238,11 +247,11 @@ void Game::CreateGeometry() {
 
 		_vertices[2].Position = { 0.5f, -0.5f, 0 };
 		// _vertices[2].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		_vertices[2].UV = { 1.0f, 1.0f };
+		_vertices[2].UV = { UV, UV };
 
 		_vertices[3].Position = { 0.5f, 0.5f, 0 };
 		// _vertices[3].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		_vertices[3].UV = { 1.0f, 0.0f };
+		_vertices[3].UV = { UV, 0.0f };
 	}
 	
 
@@ -325,6 +334,83 @@ void Game::CreatePS() {
 	LoadShaderFromFile(L"default.hlsl", "PS", "ps_5_0", _psBlob);
 	HRESULT hr = _device->CreatePixelShader(_psBlob->GetBufferPointer(), _psBlob->GetBufferSize(), nullptr, _pixelShader.GetAddressOf());
 	CHECK(hr);
+}
+
+void Game::CreateRasterizerState() {
+
+	// https://learn.microsoft.com/en-us/windows/win32/api/d3d11/ns-d3d11-d3d11_rasterizer_desc
+	D3D11_RASTERIZER_DESC desc;
+	ZeroMemory(&desc, sizeof(desc));
+
+	// 3개다 중요함.
+	// D3D11_FILL_SOLID		-> 내부를 채우겠다.
+	// D3D11_FILL_WIREFRAME -> 내부를 채우지 않는 용도로 사용할때 사용
+	desc.FillMode = D3D11_FILL_SOLID;
+
+	// D3D11_CULL_FRONT		-> 앞면을 컬링하겠다.
+	// D3D11_CULL_BACK		-> 후면을 컬링하겠다.
+	// 컬링은 보통 그리지 않게끔 스킵하는 걸 말한다. (카메라 영역을 벗어나는걸 안그린는 것도 컬링이고, 오클루젼 컬링, 무슨 컬링 다양하게 많다.)
+	desc.CullMode = D3D11_CULL_BACK;	
+
+	// desc.CullMode의 앞면과 후면은 어떻게 판단하는 것인가?에 대한 설명이다.
+	// 우리가 정점을 연결할 때 정점의 인덱스를 반시계 방향 혹은 시계 방향으로 연결할 수가 있었다.
+	// 그리고 연결한 정점은 삼각형의 구조를 가진다.
+	// 
+	// 이 변수를 true로  설정하면 반시계 방향으로 연결한 정점들로 구성된 삼각형들이 앞면임을 의미한다.
+	// 이 변수를 false로 설정하면   시계 방향으로 연결한 정점들로 구성된 삼각형들이 후면임을 의미한다.
+	desc.FrontCounterClockwise = false;
+
+	// 그외에 궁금한 것들은 문서를 찾아보면 된다.
+
+	HRESULT hr = _device->CreateRasterizerState(&desc, _rasterizerState.GetAddressOf());
+	CHECK(hr);
+}
+
+void Game::CreateSamplerState() {
+
+	// https://learn.microsoft.com/ko-kr/windows/win32/api/d3d11/ns-d3d11-d3d11_sampler_desc?redirectedfrom=MSDN
+	// SamplerState는 UV 좌표를 1을 넘어서는 부분을 어떻게 채워줄지 정해주는 녀석이라고 생각하면 된다.
+	D3D11_SAMPLER_DESC desc;
+	ZeroMemory(&desc, sizeof(desc));
+	desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	desc.BorderColor[0] = 1;	// R
+	desc.BorderColor[1] = 0;	// G
+	desc.BorderColor[2] = 0;	// B
+	desc.BorderColor[3] = 1;	// A
+
+	// 아래는 다 복붙(이런게 있다 정도 아직 세세히 알 필요는 없음)
+	desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	desc.MaxAnisotropy = 16;
+	desc.MaxLOD = FLT_MAX;
+	desc.MinLOD = FLT_MIN;
+	desc.MipLODBias = 0.0f;
+
+	_device->CreateSamplerState(&desc, _samplerState.GetAddressOf());
+}
+
+void Game::CreateBlendState() {
+	D3D11_BLEND_DESC desc;
+	ZeroMemory(&desc, sizeof(desc));
+
+	// 아래는 다 복붙
+	desc.AlphaToCoverageEnable = false;
+	desc.IndependentBlendEnable = false;
+
+	desc.RenderTarget[0].BlendEnable = false;	// false로 설정할 경우 아무런 효과가 없음
+
+	// 예를들어 캐릭터가 벽 앞에 잇는데 벽뒤로 카메라가 지나가면서 캐릭터를 보고 싶을 때
+	// 벽을 투과해서 볼 수 있게끔 설정할 때도 사용할 수 있다.
+	desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC1_ALPHA;
+	desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	_device->CreateBlendState(&desc, _blendState.GetAddressOf());
 }
 
 void Game::CreateSRV() {
