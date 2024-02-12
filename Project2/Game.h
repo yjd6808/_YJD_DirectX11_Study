@@ -33,6 +33,7 @@ private:
 	void CreateInputLayout();
 	void CreatePS();
 	void CreateGeometry();
+	void CreateSRV();
 private:
 	HWND _hwnd;
 	uint32 _width;
@@ -55,4 +56,6 @@ private:
 	ComPtr<ID3D11Buffer> _vertexBuffer;
 	vector<uint32> _indices;
 	ComPtr<ID3D11Buffer> _indexBuffer;
+
+	ComPtr<ID3D11ShaderResourceView> _shaderResourceView;
 };

@@ -28,6 +28,7 @@ void Game::Render() {
 
 		// PS
 		_deviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
+		_deviceContext->PSSetShaderResources(0, 1, _shaderResourceView.GetAddressOf());
 
 		// OM
 
@@ -55,6 +56,7 @@ void Game::Init(HWND hwnd) {
 	CreateInputLayout();
 	CreatePS();
 	CreateGeometry();
+	CreateSRV();
 }
 
 void Game::RenderBegin() {
@@ -181,7 +183,7 @@ void Game::CreatePS() {
 void Game::CreateInputLayout() {
 	D3D11_INPUT_ELEMENT_DESC layouts[]{
 		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	0,	D3D11_INPUT_PER_VERTEX_DATA	},
-		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	12,	D3D11_INPUT_PER_VERTEX_DATA	}
+		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	12,	D3D11_INPUT_PER_VERTEX_DATA	}
 	};
 
 	const int32 count = sizeof layouts / sizeof D3D11_INPUT_ELEMENT_DESC;
@@ -202,17 +204,17 @@ void Game::CreateGeometry() {
 
 		// 13
 		// 02
-		_vertices[0].Position = { -0.5f, -0.5f, 0.0f };
-		_vertices[0].Color = { 1.0f, 1.0f, 0.0f, 0.0f };
+		_vertices[0].Position	= { -0.5f, -0.5f, 0.0f };
+		_vertices[0].UV			= { 0.0f, 1.0f };
 
-		_vertices[1].Position = { -0.5f, 0.5f, 0.0f };
-		_vertices[1].Color = { 0.0f, 1.0f, 1.0f, 0.0f };
+		_vertices[1].Position	= { -0.5f, 0.5f, 0.0f };
+		_vertices[1].UV			= { 0.0f, 0.0f };
 
-		_vertices[2].Position = { 0.5f, -0.5f, 0.0f };
-		_vertices[2].Color = { 1.0f, 0.0f, 1.0f, 0.0f };
+		_vertices[2].Position	= { 0.5f, -0.5f, 0.0f };
+		_vertices[2].UV			= { 1.0f, 1.0f };
 
-		_vertices[3].Position = { 0.5f, 0.5f, 0.0f };
-		_vertices[3].Color = { 0.5f, 0.5f, 0.5f, 0.0f };
+		_vertices[3].Position	= { 0.5f, 0.5f, 0.0f };
+		_vertices[3].UV			= { 1.0f, 0.0f };
 	}
 
 	{
@@ -248,5 +250,21 @@ void Game::CreateGeometry() {
 		hr = _device->CreateBuffer(&desc, &data, _indexBuffer.GetAddressOf());
 		CHECK(hr);
 	}
+}
+
+void Game::CreateSRV() {
+	DirectX::TexMetadata md;
+	DirectX::ScratchImage img;
+	HRESULT hr = ::LoadFromWICFile(L"apple.png", WIC_FLAGS_NONE, &md, img);
+	CHECK(hr);
+
+	hr = ::CreateShaderResourceView(
+		_device.Get(),
+		img.GetImages(), 
+		img.GetImageCount(), 
+		md, 
+		_shaderResourceView.GetAddressOf()
+	);
+	CHECK(hr);
 }
 
