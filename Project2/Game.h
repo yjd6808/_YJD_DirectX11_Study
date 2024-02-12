@@ -53,4 +53,6 @@ private:
 
 	vector<Vertex> _vertices;
 	ComPtr<ID3D11Buffer> _vertexBuffer;
+	vector<uint32> _indices;
+	ComPtr<ID3D11Buffer> _indexBuffer;
 };

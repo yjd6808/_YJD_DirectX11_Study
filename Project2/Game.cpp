@@ -17,6 +17,7 @@ void Game::Render() {
 
 		// IA
 		_deviceContext->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
+		_deviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		_deviceContext->IASetInputLayout(_inputLayout.Get());
 		_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -31,7 +32,8 @@ void Game::Render() {
 		// OM
 
 		// 마지막
-		_deviceContext->Draw(_vertices.size(), 0);
+		// _deviceContext->Draw(_vertices.size(), 0);
+		_deviceContext->DrawIndexed(_indices.size(), 0, 0);
 	}
 
 	RenderEnd();
@@ -196,16 +198,21 @@ void Game::CreateInputLayout() {
 void Game::CreateGeometry() {
 	HRESULT hr;
 	{
-		_vertices.resize(3);
+		_vertices.resize(4);
 
+		// 13
+		// 02
 		_vertices[0].Position = { -0.5f, -0.5f, 0.0f };
 		_vertices[0].Color = { 1.0f, 1.0f, 0.0f, 0.0f };
 
-		_vertices[1].Position = { 0.0f, 0.5f, 0.0f };
+		_vertices[1].Position = { -0.5f, 0.5f, 0.0f };
 		_vertices[1].Color = { 0.0f, 1.0f, 1.0f, 0.0f };
 
 		_vertices[2].Position = { 0.5f, -0.5f, 0.0f };
 		_vertices[2].Color = { 1.0f, 0.0f, 1.0f, 0.0f };
+
+		_vertices[3].Position = { 0.5f, 0.5f, 0.0f };
+		_vertices[3].Color = { 0.5f, 0.5f, 0.5f, 0.0f };
 	}
 
 	{
@@ -220,6 +227,25 @@ void Game::CreateGeometry() {
 		data.pSysMem = _vertices.data();
 
 		hr = _device->CreateBuffer(&desc, &data, _vertexBuffer.GetAddressOf());
+		CHECK(hr);
+	}
+
+	{
+		_indices = { 0, 1, 2, 2, 1, 3 };
+	}
+
+	{
+		D3D11_BUFFER_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Usage = D3D11_USAGE_IMMUTABLE;
+		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		desc.ByteWidth = sizeof(uint32) * _indices.size();
+
+		D3D11_SUBRESOURCE_DATA data;
+		ZeroMemory(&data, sizeof(data));
+		data.pSysMem = _indices.data();
+
+		hr = _device->CreateBuffer(&desc, &data, _indexBuffer.GetAddressOf());
 		CHECK(hr);
 	}
 }
