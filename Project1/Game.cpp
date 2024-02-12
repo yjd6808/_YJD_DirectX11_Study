@@ -172,7 +172,9 @@ void Game::CreateDeviceAndSwapChain() {
 
 	UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #if defined(_DEBUG)
+	// https://learn.microsoft.com/en-us/windows/win32/direct3d11/overviews-direct3d-11-devices-layers
 	// If the project is in a debug build, enable the debug layer.
+	// 이 옵션을 주게 되면 D3D 오류 발생시 Output Window에 오류 메시지 출력을 해줌
 	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 

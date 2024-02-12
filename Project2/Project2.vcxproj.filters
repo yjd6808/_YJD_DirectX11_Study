@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="01. Main">
+      <UniqueIdentifier>{1d1611f3-89d3-45c0-911f-5c3cbfff95a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="91. Shaders">
+      <UniqueIdentifier>{3726c625-a6e1-412e-a0e4-f8153b71e9aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. Headers">
+      <UniqueIdentifier>{4bb7ce10-d706-4281-9c0e-73b5b9eaf4e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Resources">
+      <UniqueIdentifier>{36fcb943-d1c9-448e-a664-13181895bbff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="98. Headers\안드로메다">
+      <UniqueIdentifier>{e8491e8b-cb3d-430f-b860-43943f2694cd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>98. Headers\안드로메다</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>98. Headers\안드로메다</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>98. Headers\안드로메다</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
+      <Filter>01. Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Struct.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Pch.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Values.h">
+      <Filter>98. Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>01. Main</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Project2.ico" />
+    <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp">
+      <Filter>01. Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Pch.cpp">
+      <Filter>98. Headers</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>01. Main</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Project2.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="default.hlsl">
+      <Filter>91. Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
