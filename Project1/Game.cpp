@@ -443,7 +443,7 @@ void Game::LoadShaderFromFile(const wstring& path, const string& entryMethodName
 	// 디버그 용도이고, 최적화는 건너뛰겠다.
 	const uint32 compileFlag = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 
-	// path: 파일 명
+	// path: 파일 명ㅋ
 	// entryMethodName: 진입 함수 명
 	// verison: 셰이더 모델 버전
 	// blob: 셰이더 컴파일 결과가 저장될 Blob객체

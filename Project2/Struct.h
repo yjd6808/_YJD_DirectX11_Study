@@ -13,3 +13,9 @@ struct Vertex
 	Vec3 Position;
 	Vec2 UV;
 };
+
+struct TransformData
+{
+	Vec3 Offset;
+	float Dummy;
+};

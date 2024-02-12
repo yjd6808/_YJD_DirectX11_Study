@@ -34,6 +34,7 @@ private:
 	void CreatePS();
 	void CreateGeometry();
 	void CreateSRV();
+	void CreateConstantBuffer();
 private:
 	HWND _hwnd;
 	uint32 _width;
@@ -58,4 +59,7 @@ private:
 	ComPtr<ID3D11Buffer> _indexBuffer;
 
 	ComPtr<ID3D11ShaderResourceView> _shaderResourceView;
+
+	TransformData _transform{};
+	ComPtr<ID3D11Buffer> _constantBuffer;
 };

@@ -34,11 +34,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // Main message loop:
     while (msg.message != WM_QUIT) {
-        if (PeekMessage(&msg, g_hWnd, 0, 0, PM_REMOVE)) {
-            if (!TranslateAccelerator(msg.hwnd, nullptr, &msg)) {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
         } else {
             game.Render();
             game.Update();
