@@ -20,6 +20,9 @@ Game::~Game() {
 
 void Game::Init(HWND hwnd) {
 	_graphics = make_shared<Graphics>(hwnd);
+	_vertexBuffer = make_shared<VertexBuffer>(_graphics->GetDevice());
+	_indexBuffer = make_shared<IndexBuffer>(_graphics->GetDevice());
+	_inputLayout = make_shared<InputLayout>(_graphics->GetDevice());
 
 	CreateGeometry();		// 도형을 만든다.
 	CreateVS();				
@@ -48,10 +51,10 @@ void Game::Render() {
 		auto spDeviceContext = _graphics->GetDeviceContext();
 
 		// 렌더링 파이프라인 그림에서 VertexBuffer를 IA와 연결하는 단계를 수행해준다.
-		spDeviceContext->IASetVertexBuffers(0, 1, _vertexBuffer.GetAddressOf(), &stride, &offset);
-		spDeviceContext->IASetIndexBuffer(_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+		spDeviceContext->IASetVertexBuffers(0, 1, _vertexBuffer->GetComPtr().GetAddressOf(), &stride, &offset);
+		spDeviceContext->IASetIndexBuffer(_indexBuffer->GetComPtr().Get(), DXGI_FORMAT_R32_UINT, 0);
 		// VertexBuffer는 데이터 쪼가리일 뿐이므로 inputLayout으로 어떻게 묘사되어있는지 알려줘야한다.
-		spDeviceContext->IASetInputLayout(_inputLayout.Get());
+		spDeviceContext->IASetInputLayout(_inputLayout->GetComPtr().Get());
 		// 정점을 어떻게 연결할지, 보통 삼각형으로 연결하므로 거의 항상 D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST를 전달한다.
 		spDeviceContext->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -134,29 +137,8 @@ void Game::CreateGeometry() {
 	}
 	
 
-	// 메모리 데이터를 GPU에 메모리에 전달하기 위함
-	// 버텍스 버퍼
 	{
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-
-		// 이 버퍼는 어떤 용도로 사용할 것인가?
-		// D3D11_USAGE_DEFAULT: GPU만 읽고 쓸 수 있다.
-		// D3D11_USAGE_IMMUTABLE: GPU만 읽을 수 있다.
-		// D3D11_USAGE_DYNAMIC: CPU는 쓸 수 있고 GPU는 읽을수만 있다.
-		// immutable로 세팅한 이유는 우리가 처음 다이렉트X를 초기화하면서 도형을 버퍼에 기록해놓고 중간에 변경하지 않을 것이기 때문
-		desc.Usage = D3D11_USAGE_IMMUTABLE;
-		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;	// 우리가 이 버퍼를 버텍스 버퍼로 사용하겠다는 용도를 적어준다.
-		desc.ByteWidth = sizeof(Vertex) * _vertices.size(); // 버텍스 버퍼의 크기를 알려준다.
-
-		// _vertexBuffer로 어떤 버퍼의 데이터를 복사해올 것인가?
-		D3D11_SUBRESOURCE_DATA data;
-		ZeroMemory(&data, sizeof(data));
-		data.pSysMem = _vertices.data(); // _vertices의 데이터를 복사해주기위함
-
-		// desc와 data를 바탕으로 GPU가 다루는 버텍스 버퍼를 생성한다.
-		hr = _graphics->GetDevice()->CreateBuffer(&desc, &data, _vertexBuffer.GetAddressOf());
-		CHECK(hr);
+		_vertexBuffer->Create(_vertices);
 	}
 
 
@@ -167,21 +149,7 @@ void Game::CreateGeometry() {
 
 	// 인덱스 버퍼
 	{
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-
-		desc.Usage = D3D11_USAGE_IMMUTABLE;
-		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;	// 우리가 이 버퍼를 버텍스 버퍼로 사용하겠다는 용도를 적어준다.
-		desc.ByteWidth = sizeof(uint32) * _indices.size(); // 버텍스 버퍼의 크기를 알려준다.
-
-		// _vertexBuffer로 어떤 버퍼의 데이터를 복사해올 것인가?
-		D3D11_SUBRESOURCE_DATA data;
-		ZeroMemory(&data, sizeof(data));
-		data.pSysMem = _indices.data(); // _vertices의 데이터를 복사해주기위함
-
-		// desc와 data를 바탕으로 GPU가 다루는 버텍스 버퍼를 생성한다.
-		hr = _graphics->GetDevice()->CreateBuffer(&desc, &data, _indexBuffer.GetAddressOf());
-		CHECK(hr);
+		_indexBuffer->Create(_indices);
 	}
 }
 
@@ -191,13 +159,14 @@ void Game::CreateInputLayout() {
 	// 어떤 녀석인지 묘사해주기 위함.
 
 	// Vertex::Position 멤버가 12바이트를 차지하고 있으므로 Color는 12
-	D3D11_INPUT_ELEMENT_DESC layouts[] = {
+	vector<D3D11_INPUT_ELEMENT_DESC> layout = 
+	{
 		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 0,	D3D11_INPUT_PER_VERTEX_DATA },
 		// { "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 12,	D3D11_INPUT_PER_VERTEX_DATA }
 		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 12,	D3D11_INPUT_PER_VERTEX_DATA }
 	};
-	const int32 count = sizeof(layouts) / sizeof(D3D11_INPUT_ELEMENT_DESC);
-	_graphics->GetDevice()->CreateInputLayout(layouts, count, _vsBlob->GetBufferPointer(), _vsBlob->GetBufferSize(), _inputLayout.GetAddressOf());
+
+	_inputLayout->Create(layout, _vsBlob);
 }
 
 void Game::CreateVS() {

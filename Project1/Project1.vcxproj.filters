@@ -81,6 +81,15 @@
     <ClInclude Include="Graphics.h">
       <Filter>00. Engine</Filter>
     </ClInclude>
+    <ClInclude Include="VertexBuffer.h">
+      <Filter>00. Engine\01. InputAssembler</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexBuffer.h">
+      <Filter>00. Engine\01. InputAssembler</Filter>
+    </ClInclude>
+    <ClInclude Include="InputLayout.h">
+      <Filter>00. Engine\01. InputAssembler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -97,6 +106,15 @@
     </ClCompile>
     <ClCompile Include="Graphics.cpp">
       <Filter>00. Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>00. Engine\01. InputAssembler</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexBuffer.cpp">
+      <Filter>00. Engine\01. InputAssembler</Filter>
+    </ClCompile>
+    <ClCompile Include="InputLayout.cpp">
+      <Filter>00. Engine\01. InputAssembler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

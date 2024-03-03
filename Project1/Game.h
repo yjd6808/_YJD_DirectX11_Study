@@ -39,11 +39,10 @@ private:
 	// [ CPU <-> RAM ]: 아직까지는 RAM에 저장된 정보이다.
 	// [ GPU <-> VRAM ]
 	vector<Vertex> _vertices;
-	ComPtr<ID3D11Buffer> _vertexBuffer;	// RAM 저장된 데이터를 VRAM으로 복사해주기 위한 버퍼이다.
+	shared_ptr<VertexBuffer> _vertexBuffer;
 	vector<uint32> _indices;
-	ComPtr<ID3D11Buffer> _indexBuffer;
-
-	ComPtr<ID3D11InputLayout> _inputLayout;
+	shared_ptr<IndexBuffer> _indexBuffer;
+	shared_ptr<InputLayout> _inputLayout;
 
 	// VS(버텍스 셰이더)
 	ComPtr<ID3D11VertexShader> _vertexShader;

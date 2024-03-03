@@ -34,6 +34,9 @@ using namespace std;
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-#include "Graphics.h"
-
 #define CHECK(p)		assert(SUCCEEDED(p))
+
+#include "Graphics.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "InputLayout.h"
