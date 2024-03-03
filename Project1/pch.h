@@ -7,6 +7,7 @@
 
 // STL
 #include <vector>
+#include <memory>
 #include <list>
 #include <map>
 #include <unordered_map>
@@ -32,5 +33,7 @@ using namespace std;
 #include "DirectXTex/DirectXTex.inl"
 using namespace DirectX;
 using namespace Microsoft::WRL;
+
+#include "Graphics.h"
 
 #define CHECK(p)		assert(SUCCEEDED(p))

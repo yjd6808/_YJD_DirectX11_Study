@@ -22,6 +22,27 @@
     <Filter Include="98. Headers\Libs">
       <UniqueIdentifier>{cb50656c-4d97-4f10-896c-2feac40af64d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. Engine">
+      <UniqueIdentifier>{3cf7a2c2-c999-43d0-b95e-cabaadc3d305}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. Engine\00. Geometry">
+      <UniqueIdentifier>{d7647be5-ea5e-43b5-939c-ac5f24f4d06c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. Engine\01. InputAssembler">
+      <UniqueIdentifier>{0d8521b6-3bdd-4a8a-88c9-26681ada9034}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. Engine\02. VertexShader">
+      <UniqueIdentifier>{dcd2482f-202d-428a-b226-0687acef3720}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. Engine\03. Rasterizer">
+      <UniqueIdentifier>{b65be3d7-c7a9-4a09-a370-d20256c92016}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. Engine\04. PixelShader">
+      <UniqueIdentifier>{b67698fb-c1bf-415f-a9da-4ef5b046fa5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. Engine\05. OutputMerger">
+      <UniqueIdentifier>{50e0ec89-5225-4e03-af07-1e8ba576e204}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -54,6 +75,12 @@
     <ClInclude Include="SimpleMath.h">
       <Filter>98. Headers\Libs</Filter>
     </ClInclude>
+    <ClInclude Include="SimpleMath.inl">
+      <Filter>98. Headers\Libs</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics.h">
+      <Filter>00. Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -67,6 +94,9 @@
     </ClCompile>
     <ClCompile Include="SimpleMath.cpp">
       <Filter>98. Headers\Libs</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics.cpp">
+      <Filter>00. Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,10 +116,5 @@
     <FxCompile Include="default.hlsl">
       <Filter>91. Shaders</Filter>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="SimpleMath.inl">
-      <Filter>98. Headers\Libs</Filter>
-    </None>
   </ItemGroup>
 </Project>
