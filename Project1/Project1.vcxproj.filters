@@ -19,6 +19,9 @@
     <Filter Include="91. Shaders">
       <UniqueIdentifier>{a4ab1474-3a35-4559-aa28-5311da1ced0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="98. Headers\Libs">
+      <UniqueIdentifier>{cb50656c-4d97-4f10-896c-2feac40af64d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h">
@@ -48,6 +51,9 @@
     <ClInclude Include="Game.h">
       <Filter>01. Main</Filter>
     </ClInclude>
+    <ClInclude Include="SimpleMath.h">
+      <Filter>98. Headers\Libs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -58,6 +64,9 @@
     </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>01. Main</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleMath.cpp">
+      <Filter>98. Headers\Libs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -77,5 +86,10 @@
     <FxCompile Include="default.hlsl">
       <Filter>91. Shaders</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SimpleMath.inl">
+      <Filter>98. Headers\Libs</Filter>
+    </None>
   </ItemGroup>
 </Project>

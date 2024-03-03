@@ -88,8 +88,13 @@ void Game::Render() {
 
 void Game::Update() {
 
-	// _transformData.offset.x += 0.003f;
-	// _transformData.offset.y += 0.003f;
+	Matrix matScale = Matrix::CreateScale(_localScale);
+	Matrix matRotation = Matrix::CreateRotationX(_localRotation.x);
+	matRotation *= Matrix::CreateRotationY(_localRotation.y);
+	matRotation *= Matrix::CreateRotationZ(_localRotation.z);
+	Matrix matTranslation = Matrix::CreateTranslation(_localPosition);
+
+	_transformData.MatWorld = matScale * matRotation * matTranslation;
 
 	D3D11_MAPPED_SUBRESOURCE subResource;
 	ZeroMemory(&subResource, sizeof(subResource));
@@ -239,21 +244,21 @@ void Game::CreateGeometry() {
 		// 정점 설정 순서는 반시계 방향
 		// 13
 		// 02
-		_vertices[0].Position = { -0.5f, -0.5f, 0.0f };
+		_vertices[0].Position = Vec3{ -0.5f, -0.5f, 0.0f };
 		// _vertices[0].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		_vertices[0].UV = { 0.0f, UV };
+		_vertices[0].UV = Vec2{ 0.0f, UV };
 
-		_vertices[1].Position = { -0.5, 0.5f, 0 };
+		_vertices[1].Position = Vec3{ -0.5, 0.5f, 0 };
 		// _vertices[1].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		_vertices[1].UV = { 0.0f, 0.0f };
+		_vertices[1].UV = Vec2{ 0.0f, 0.0f };
 
-		_vertices[2].Position = { 0.5f, -0.5f, 0 };
+		_vertices[2].Position = Vec3{ 0.5f, -0.5f, 0 };
 		// _vertices[2].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		_vertices[2].UV = { UV, UV };
+		_vertices[2].UV = Vec2{ UV, UV };
 
-		_vertices[3].Position = { 0.5f, 0.5f, 0 };
+		_vertices[3].Position = Vec3{ 0.5f, 0.5f, 0 };
 		// _vertices[3].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		_vertices[3].UV = { UV, 0.0f };
+		_vertices[3].UV = Vec2{ UV, 0.0f };
 	}
 	
 

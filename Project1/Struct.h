@@ -18,6 +18,7 @@ struct Vertex
 
 struct TransformData
 {
-	Vec3 offset;
-	float dummy;	// float4를 맞춰주기 위함
+	Matrix MatWorld = Matrix::Identity;
+	Matrix MatView = Matrix::Identity;
+	Matrix MatProjection = Matrix::Identity;
 };

@@ -25,7 +25,9 @@ struct VS_OUTPUT
 
 cbuffer TransformData : register(b0)
 {
-	float4 offset;
+	row_major matrix matWorld;
+	row_major matrix matView;
+	row_major matrix matProjection;
 }
 
 // IA -> VS -> RS -> PS -> OM
@@ -33,9 +35,14 @@ cbuffer TransformData : register(b0)
 // 이 함수는 정점 단위로 시행된다.
 VS_OUTPUT VS(VS_INPUT input)
 {
-	// 다다음주쯤에는 여러 수학을 활용해서 프로젝션등 처리를 해주지만 우선 처음 배우는 단계이니 그냥 반환한다.
 	VS_OUTPUT output;
-	output.position = input.position + offset;
+
+	// WVP (World * View * Projection)을 수행한다.
+	float4 position = mul(input.position, matWorld);
+	position = mul(position, matView);
+	position = mul(position, matProjection);
+
+	output.position = position;
 	// output.color = input.color;
 	output.uv = input.uv;
 	return output;
