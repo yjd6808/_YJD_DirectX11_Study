@@ -40,3 +40,6 @@ using namespace Microsoft::WRL;
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "InputLayout.h"
+#include "VertexData.h"
+#include "Geometry.h"
+#include "GeometryHelper.h"

@@ -28,7 +28,7 @@ public:
 		// immutable로 세팅한 이유는 우리가 처음 다이렉트X를 초기화하면서 도형을 버퍼에 기록해놓고 중간에 변경하지 않을 것이기 때문
 		desc.Usage = D3D11_USAGE_IMMUTABLE;
 		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;	// 우리가 이 버퍼를 버텍스 버퍼로 사용하겠다는 용도를 적어준다.
-		desc.ByteWidth = sizeof(Vertex) * _count; // 버텍스 버퍼의 크기를 알려준다.
+		desc.ByteWidth = sizeof(T) * _count; // 버텍스 버퍼의 크기를 알려준다.
 
 		// _vertexBuffer로 어떤 버퍼의 데이터를 복사해올 것인가?
 		D3D11_SUBRESOURCE_DATA data;

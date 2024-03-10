@@ -23,6 +23,7 @@ void Game::Init(HWND hwnd) {
 	_vertexBuffer = make_shared<VertexBuffer>(_graphics->GetDevice());
 	_indexBuffer = make_shared<IndexBuffer>(_graphics->GetDevice());
 	_inputLayout = make_shared<InputLayout>(_graphics->GetDevice());
+	_geometry = make_shared<Geometry<VertexTextureData>>();
 
 	CreateGeometry();		// 도형을 만든다.
 	CreateVS();				
@@ -45,7 +46,7 @@ void Game::Render() {
 	// 여기서 여러가지 물체들을 그린다.
 	{
 		// IA단계에서 할일
-		uint32 stride = sizeof(Vertex);
+		uint32 stride = sizeof(VertexTextureData);
 		uint32 offset = 0;
 
 		auto spDeviceContext = _graphics->GetDeviceContext();
@@ -77,7 +78,7 @@ void Game::Render() {
 		spDeviceContext->OMSetBlendState(_blendState.Get(), nullptr, 0xffffffff);
 
 		// 물체를 그려달라고 요청한다.
-		spDeviceContext->DrawIndexed(_indices.size(), 0, 0);
+		spDeviceContext->DrawIndexed(_geometry->GetIndexCount(), 0, 0);
 	}
 
 	// 그림을 다 그렸으니 제출한다.
@@ -109,64 +110,17 @@ void Game::Update() {
 }
 
 void Game::CreateGeometry() {
-	HRESULT hr;
-	// 버텍스 정보
-	{
-		constexpr float UV = 2.0f;
+	GeometryHelper::CreateRectangle(_geometry);
 
-		_vertices.resize(4);
-
-		// 정점 설정 순서는 반시계 방향
-		// 13
-		// 02
-		_vertices[0].Position = Vec3{ -0.5f, -0.5f, 0.0f };
-		// _vertices[0].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		_vertices[0].UV = Vec2{ 0.0f, UV };
-
-		_vertices[1].Position = Vec3{ -0.5, 0.5f, 0 };
-		// _vertices[1].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		_vertices[1].UV = Vec2{ 0.0f, 0.0f };
-
-		_vertices[2].Position = Vec3{ 0.5f, -0.5f, 0 };
-		// _vertices[2].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		_vertices[2].UV = Vec2{ UV, UV };
-
-		_vertices[3].Position = Vec3{ 0.5f, 0.5f, 0 };
-		// _vertices[3].Color = { 1.0f, 0.0f, 0.0f, 1.0f };
-		_vertices[3].UV = Vec2{ UV, 0.0f };
-	}
-	
-
-	{
-		_vertexBuffer->Create(_vertices);
-	}
-
-
-	// 인덱스 정보
-	{
-		_indices = { 0, 1, 2, 2, 1, 3 };	// 시계 방향을 골랐으면, 똑같이 유지해줘야한다.
-	}
-
-	// 인덱스 버퍼
-	{
-		_indexBuffer->Create(_indices);
-	}
+	_vertexBuffer->Create(_geometry->GetVertices());
+	_indexBuffer->Create(_geometry->GetIndices());
 }
 
 void Game::CreateInputLayout() {
 
 	// GPU에서 봤을 때는 아직 VertexBuffer정보도 데이터쪼가리일 뿐이다.
 	// 어떤 녀석인지 묘사해주기 위함.
-
-	// Vertex::Position 멤버가 12바이트를 차지하고 있으므로 Color는 12
-	vector<D3D11_INPUT_ELEMENT_DESC> layout = 
-	{
-		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0, 0,	D3D11_INPUT_PER_VERTEX_DATA },
-		// { "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0, 12,	D3D11_INPUT_PER_VERTEX_DATA }
-		{ "TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0, 12,	D3D11_INPUT_PER_VERTEX_DATA }
-	};
-
-	_inputLayout->Create(layout, _vsBlob);
+	_inputLayout->Create(VertexTextureData::Descs, _vsBlob);
 }
 
 void Game::CreateVS() {

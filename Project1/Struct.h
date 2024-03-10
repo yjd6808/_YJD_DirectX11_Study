@@ -8,14 +8,6 @@
 
 #pragma once
 
-
-struct Vertex
-{
-	Vec3 Position;
-	// Color Color;
-	Vec2 UV;
-};
-
 struct TransformData
 {
 	Matrix MatWorld = Matrix::Identity;
