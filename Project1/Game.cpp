@@ -20,22 +20,29 @@ Game::~Game() {
 
 void Game::Init(HWND hwnd) {
 	_graphics = make_shared<Graphics>(hwnd);
-	_vertexBuffer = make_shared<VertexBuffer>(_graphics->GetDevice());
-	_indexBuffer = make_shared<IndexBuffer>(_graphics->GetDevice());
-	_inputLayout = make_shared<InputLayout>(_graphics->GetDevice());
+	ComPtr<ID3D11Device> device = _graphics->GetDevice();
+	ComPtr<ID3D11DeviceContext> deviceContext = _graphics->GetDeviceContext();
+
+	_vertexBuffer = make_shared<VertexBuffer>(device);
+	_indexBuffer = make_shared<IndexBuffer>(device);
+	_inputLayout = make_shared<InputLayout>(device);
 	_geometry = make_shared<Geometry<VertexTextureData>>();
+	_vertexShader = make_shared<VertexShader>(device);
+	_pixelShader = make_shared<PixelShader>(device);
+	_constantBuffer = make_shared<ConstantBuffer<TransformData>>(device, deviceContext);
+	_texture = make_shared<Texture>(device);
 
 	CreateGeometry();		// 도형을 만든다.
-	CreateVS();				
-	CreateInputLayout();
-	CreatePS();
-
+	_vertexShader->Create(L"default.hlsl", "VS", "vs_5_0");
+	_inputLayout->Create(VertexTextureData::Descs, _vertexShader->GetBlob());
+	_pixelShader->Create(L"default.hlsl", "PS", "ps_5_0");
+	
 	CreateRasterizerState();
 	CreateSamplerState();
 	CreateBlendState();
-	CreateSRV();
 
-	CreateConstantBuffer();
+	_texture->Create(L"apple.png");
+	_constantBuffer->Create();
 }
 
 void Game::Render() {
@@ -62,16 +69,16 @@ void Game::Render() {
 
 		// VS단계에서 할일
 		// 우리가 셰이더 파일 읽어와서 메모리에 들고있는데 이 데이터를 가지고 작업을 진행해줘
-		spDeviceContext->VSSetShader(_vertexShader.Get(), nullptr, 0);
-		spDeviceContext->VSSetConstantBuffers(0, 1, _constantBuffer.GetAddressOf());
+		spDeviceContext->VSSetShader(_vertexShader->GetComPtr().Get(), nullptr, 0);
+		spDeviceContext->VSSetConstantBuffers(0, 1, _constantBuffer->GetComPtr().GetAddressOf());
 
 
 		// RS단계에서 할일
 		spDeviceContext->RSSetState(_rasterizerState.Get());
 
 		// PS단계에서 할일
-		spDeviceContext->PSSetShader(_pixelShader.Get(), nullptr, 0);
-		spDeviceContext->PSSetShaderResources(0, 1, _shaderResourceView.GetAddressOf());
+		spDeviceContext->PSSetShader(_pixelShader->GetComPtr().Get(), nullptr, 0);
+		spDeviceContext->PSSetShaderResources(0, 1, _texture->GetComPtr().GetAddressOf());
 		spDeviceContext->PSSetSamplers(0, 1, _samplerState.GetAddressOf());
 
 		// OM
@@ -94,19 +101,7 @@ void Game::Update() {
 	Matrix matTranslation = Matrix::CreateTranslation(_localPosition);
 
 	_transformData.MatWorld = matScale * matRotation * matTranslation;
-
-	D3D11_MAPPED_SUBRESOURCE subResource;
-	ZeroMemory(&subResource, sizeof(subResource));
-
-	// Map으로 뚜겅을 연다. 이제 constantBuffer에 데이터를 쓸 수 있다.
-	// constantBuffer의 메모리 위치를 의미하는 녀석이 subResource이다.
-	_graphics->GetDeviceContext()->Map(_constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &subResource);
-
-	// CPU -> GPU 데이터쓰기
-	::memcpy(subResource.pData, &_transformData, sizeof(TransformData));
-
-	// Unamp으로 뚜껑을 닫는다. 더이상 수정 불가능하다.
-	_graphics->GetDeviceContext()->Unmap(_constantBuffer.Get(), 0);
+	_constantBuffer->CopyData(_transformData);
 }
 
 void Game::CreateGeometry() {
@@ -114,28 +109,6 @@ void Game::CreateGeometry() {
 
 	_vertexBuffer->Create(_geometry->GetVertices());
 	_indexBuffer->Create(_geometry->GetIndices());
-}
-
-void Game::CreateInputLayout() {
-
-	// GPU에서 봤을 때는 아직 VertexBuffer정보도 데이터쪼가리일 뿐이다.
-	// 어떤 녀석인지 묘사해주기 위함.
-	_inputLayout->Create(VertexTextureData::Descs, _vsBlob);
-}
-
-void Game::CreateVS() {
-
-	// Default.hlsl을 컴파일해서 _vsBlob에 담아준다
-	LoadShaderFromFile(L"default.hlsl", "VS", "vs_5_0", _vsBlob);
-	HRESULT hr = _graphics->GetDevice()->CreateVertexShader(_vsBlob->GetBufferPointer(), _vsBlob->GetBufferSize(), nullptr, _vertexShader.GetAddressOf());
-	CHECK(hr);
-}
-
-void Game::CreatePS() {
-	// Default.hlsl을 컴파일해서 _psBlob에 담아준다
-	LoadShaderFromFile(L"default.hlsl", "PS", "ps_5_0", _psBlob);
-	HRESULT hr = _graphics->GetDevice()->CreatePixelShader(_psBlob->GetBufferPointer(), _psBlob->GetBufferSize(), nullptr, _pixelShader.GetAddressOf());
-	CHECK(hr);
 }
 
 void Game::CreateRasterizerState() {
@@ -213,50 +186,4 @@ void Game::CreateBlendState() {
 	desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	_graphics->GetDevice()->CreateBlendState(&desc, _blendState.GetAddressOf());
-}
-
-void Game::CreateSRV() {
-	// Shader에 리소스로 사용할 수 있는 뷰다. (Shader Resource View)
-	DirectX::TexMetadata md;
-	DirectX::ScratchImage img;
-	HRESULT hr = ::LoadFromWICFile(L"apple.png", WIC_FLAGS_NONE, &md, img);
-	CHECK(hr);
-
-	hr = ::CreateShaderResourceView(_graphics->GetDevice().Get(), img.GetImages(), img.GetImageCount(), md, _shaderResourceView.GetAddressOf());
-	CHECK(hr);
-}
-
-void Game::CreateConstantBuffer() {
-	D3D11_BUFFER_DESC desc;
-	ZeroMemory(&desc, sizeof(desc));
-	desc.Usage = D3D11_USAGE_DYNAMIC; // CPU_WRITE + GPU_READ
-	desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	desc.ByteWidth = sizeof(TransformData);
-	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	HRESULT hr = _graphics->GetDevice()->CreateBuffer(&desc, nullptr, _constantBuffer.GetAddressOf());
-	CHECK(hr);
-}
-
-void Game::LoadShaderFromFile(const wstring& path, const string& entryMethodName, const string& version, ComPtr<ID3DBlob>& blob) {
-
-	// d3dcompiler.lib이 제공해주는 함수
-	// 디버그 용도이고, 최적화는 건너뛰겠다.
-	const uint32 compileFlag = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-
-	// path: 파일 명ㅋ
-	// entryMethodName: 진입 함수 명
-	// verison: 셰이더 모델 버전
-	// blob: 셰이더 컴파일 결과가 저장될 Blob객체
-	HRESULT hr = ::D3DCompileFromFile(
-		path.c_str(),
-		nullptr,
-		D3D_COMPILE_STANDARD_FILE_INCLUDE,
-		entryMethodName.c_str(),
-		version.c_str(),
-		compileFlag,
-		0,
-		blob.GetAddressOf(),
-		nullptr
-	);
-	CHECK(hr);
 }

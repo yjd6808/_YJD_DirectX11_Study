@@ -19,19 +19,9 @@ public:
 	void Update();
 private:
 	void CreateGeometry();
-	void CreateInputLayout();
-
-	void CreateVS();
-	void CreatePS();
-
 	void CreateRasterizerState();
 	void CreateSamplerState();
 	void CreateBlendState();
-	void CreateSRV(); //Shader Resource View
-
-	void CreateConstantBuffer();
-
-	void LoadShaderFromFile(const wstring& path, const string& entryMethodName, const string& version, ComPtr<ID3DBlob>& blob);
 private:
 	shared_ptr<Graphics> _graphics;
 private:
@@ -45,25 +35,23 @@ private:
 	shared_ptr<InputLayout> _inputLayout;
 
 	// VS(버텍스 셰이더)
-	ComPtr<ID3D11VertexShader> _vertexShader;
-	ComPtr<ID3DBlob> _vsBlob;
+	shared_ptr<VertexShader> _vertexShader;
 
 	// RS(Resterizer State)
 	ComPtr<ID3D11RasterizerState> _rasterizerState;
 
 	// PS(픽셀 셰이더)
-	ComPtr<ID3D11PixelShader> _pixelShader;
-	ComPtr<ID3DBlob> _psBlob;
+	shared_ptr<PixelShader> _pixelShader;
 
 	// SRV
-	ComPtr<ID3D11ShaderResourceView> _shaderResourceView;
+	shared_ptr<Texture> _texture;
 
 	ComPtr<ID3D11SamplerState> _samplerState;
 	ComPtr<ID3D11BlendState> _blendState;
 private:
 	// 상수버퍼
 	TransformData _transformData;
-	ComPtr<ID3D11Buffer> _constantBuffer;
+	shared_ptr<ConstantBuffer<TransformData>> _constantBuffer;
 
 	Vec3 _localPosition = { 0.f, 0.f, 0.f };
 	Vec3 _localRotation = { 0.f, 0.f, 0.f };
