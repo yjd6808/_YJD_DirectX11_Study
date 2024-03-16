@@ -1,6 +1,5 @@
 #pragma once
 
-// ShaderResource를 사용할 건데
 enum ShaderScope
 {
 	SS_None = 0,

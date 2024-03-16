@@ -19,11 +19,9 @@ public:
 	void Update();
 private:
 	void CreateGeometry();
-	void CreateRasterizerState();
-	void CreateSamplerState();
-	void CreateBlendState();
 private:
 	shared_ptr<Graphics> _graphics;
+	shared_ptr<Pipeline> _pipeline;
 private:
 	// 도형
 	// [ CPU <-> RAM ]: 아직까지는 RAM에 저장된 정보이다.
@@ -38,7 +36,7 @@ private:
 	shared_ptr<VertexShader> _vertexShader;
 
 	// RS(Resterizer State)
-	ComPtr<ID3D11RasterizerState> _rasterizerState;
+	shared_ptr<RasterizerState> _rasterizerState;
 
 	// PS(픽셀 셰이더)
 	shared_ptr<PixelShader> _pixelShader;
@@ -46,8 +44,8 @@ private:
 	// SRV
 	shared_ptr<Texture> _texture;
 
-	ComPtr<ID3D11SamplerState> _samplerState;
-	ComPtr<ID3D11BlendState> _blendState;
+	shared_ptr<SamplerState> _samplerState;
+	shared_ptr<BlendState> _blendState;
 private:
 	// 상수버퍼
 	TransformData _transformData;

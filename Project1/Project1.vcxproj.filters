@@ -108,6 +108,18 @@
     <ClInclude Include="Texture.h">
       <Filter>00. Engine\04. PixelShader</Filter>
     </ClInclude>
+    <ClInclude Include="BlendState.h">
+      <Filter>00. Engine\05. OutputMerger</Filter>
+    </ClInclude>
+    <ClInclude Include="SamplerState.h">
+      <Filter>00. Engine\04. PixelShader</Filter>
+    </ClInclude>
+    <ClInclude Include="RasterizerState.h">
+      <Filter>00. Engine\03. Rasterizer</Filter>
+    </ClInclude>
+    <ClInclude Include="Pipeline.h">
+      <Filter>00. Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -151,6 +163,18 @@
     </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>00. Engine\04. PixelShader</Filter>
+    </ClCompile>
+    <ClCompile Include="BlendState.cpp">
+      <Filter>00. Engine\05. OutputMerger</Filter>
+    </ClCompile>
+    <ClCompile Include="RasterizerState.cpp">
+      <Filter>00. Engine\03. Rasterizer</Filter>
+    </ClCompile>
+    <ClCompile Include="SamplerState.cpp">
+      <Filter>00. Engine\04. PixelShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Pipeline.cpp">
+      <Filter>00. Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
