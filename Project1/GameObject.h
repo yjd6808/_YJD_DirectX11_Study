@@ -1,6 +1,8 @@
 ﻿#pragma once
 
-class GameObject
+class Transform;
+
+class GameObject : public std::enable_shared_from_this<GameObject>
 {
 public:
 	GameObject(ComPtr<ID3D11Device> device, ComPtr<ID3D11DeviceContext> deviceContext);
@@ -26,8 +28,7 @@ private:
 	TransformData _transformData;
 	shared_ptr<ConstantBuffer<TransformData>> _constantBuffer;
 
-	Vec3 _localPosition = { 0.f, 0.f, 0.f };
-	Vec3 _localRotation = { 0.f, 0.f, 0.f };
-	Vec3 _localScale = { 1.f, 1.f, 1.f };
+	shared_ptr<Transform> _transform;
+	shared_ptr<Transform> _parentTransform;
 };
 

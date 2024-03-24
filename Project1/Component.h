@@ -3,7 +3,7 @@
 class Component
 {
 public:
-	Component(const shared_ptr<GameObject>& owner);
+	Component();
 	virtual ~Component();
 
 	virtual void Init() = 0;
